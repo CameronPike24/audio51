@@ -50,7 +50,7 @@ class Recorder(object):
         self.AudioSource = autoclass('android.media.MediaRecorder$AudioSource')
         self.AudioFormat = autoclass('android.media.AudioFormat')
         self.AudioRecord = autoclass('android.media.AudioRecord')
-    # define our system
+        # define our system
         self.SampleRate = 44100
         #self.SampleRate = 16000
         self.ChannelConfig = self.AudioFormat.CHANNEL_IN_MONO
@@ -66,7 +66,7 @@ class Recorder(object):
         print(self.mic.channels)
         
         
-        
+        '''
         ###################################################
         # Step 1 - Load bird model
         ######################################################
@@ -120,7 +120,7 @@ class Recorder(object):
             print('ERROR: Please use models trained with Model Maker or downloaded from TensorFlow Hub.')
             raise ValueError('Invalid TFLite model: no metadata found.')        
         
-        
+        '''
         
         
         
