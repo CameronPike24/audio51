@@ -220,8 +220,7 @@ class Recorder(object):
         #self.sound.getCurrentPosition()
         #self.sound.getDuration()   
         
-              
-    def load_model():
+
    
 
 
