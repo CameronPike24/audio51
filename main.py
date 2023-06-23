@@ -16,6 +16,12 @@ from kivy_garden.graph import Graph, LinePlot
 import numpy as np 
 from array import array
 from datetime import datetime
+
+import tensorflow as tf
+
+import zipfile
+
+import wave, struct
  
  
 
@@ -45,8 +51,8 @@ class Recorder(object):
         self.AudioFormat = autoclass('android.media.AudioFormat')
         self.AudioRecord = autoclass('android.media.AudioRecord')
     # define our system
-        #self.SampleRate = 44100
-        self.SampleRate = 16000
+        self.SampleRate = 44100
+        #self.SampleRate = 16000
         self.ChannelConfig = self.AudioFormat.CHANNEL_IN_MONO
         self.AudioEncoding = self.AudioFormat.ENCODING_PCM_16BIT
         self.BufferSize = self.AudioRecord.getMinBufferSize(self.SampleRate, self.ChannelConfig, self.AudioEncoding)
@@ -58,6 +64,66 @@ class Recorder(object):
         print(self.AudioSource)
         print("This is the mic channels")
         print(self.mic.channels)
+        
+        
+        
+        ###################################################
+        # Step 1 - Load bird model
+        ######################################################
+
+        # Load TFLite model and allocate tensors.
+        #This is to load the default yamnet model which you dont need to do
+        #with open('lite-model_yamnet_tflite_1.tflite', 'rb') as fid:
+
+        #Open the bird model
+        with open('my_birds_model.tflite', 'rb') as fid:
+            tflite_model = fid.read()    
+
+        #interpreter = tf.lite.Interpreter('lite-model_yamnet_tflite_1.tflite')
+        interpreter = tf.lite.Interpreter(model_content=tflite_model)             
+        
+        
+        
+        ###################################################
+        # Step 2 - Get labels/bird names from metadata inside mdel
+        ######################################################
+
+        try:
+            #with zipfile.ZipFile('my_birds_model.tflite') as model_with_metadata:
+            with zipfile.ZipFile('./birds_models/my_birds_model.tflite') as model_with_metadata: 
+  
+                if not model_with_metadata.namelist():
+                    raise ValueError('Invalid TFLite model: no label file found.')
+
+
+                #the file name below retrieves the default Yamnet model metadata
+                #file_name = model_with_metadata.namelist()[0]
+                #or
+                #the file name below retrieves the new bird model metadata namely [1]
+                file_name = model_with_metadata.namelist()[1]
+
+                with model_with_metadata.open(file_name) as label_file:
+                    label_list = label_file.read().splitlines()
+                    print("label_list")
+                    print(label_list)
+                    #_label_list = [label.decode('ascii') for label in label_list]
+                    _label_list = [label.decode('utf-8') for label in label_list]
+      
+                    print("_label_list")
+                    print(_label_list)  #Should print list of bird codes ['azaspi1', 'chcant2', 'houspa', 'redcro', 'wbwwre1']
+      
+                    print(len(_label_list))  # should print 5   
+      
+                    #print(test_data.index_to_label[0])
+      
+        except zipfile.BadZipFile:
+            print('ERROR: Please use models trained with Model Maker or downloaded from TensorFlow Hub.')
+            raise ValueError('Invalid TFLite model: no metadata found.')        
+        
+        
+        
+        
+        
  
     def mic_callback(self, buf):
         self.sData.append(buf)
@@ -155,7 +221,8 @@ class Recorder(object):
         #self.sound.getDuration()   
         
               
-        
+    def load_model():
+   
 
 
 
